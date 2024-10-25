@@ -21,19 +21,19 @@ jobs:
 
       # Build Docker image for the server
       - name: Build Docker Image for Server
-        run: docker build -t akashgrowmore/aus-liza-nodejs -f ./server/Dockerfile ./server
+        run: docker build -t akashgrowmore/results-nodejs -f ./server/Dockerfile ./server
 
       # Push server image to Docker Hub
       - name: Publish Server Image to Docker Hub
-        run: docker push akashgrowmore/aus-liza-nodejs:latest
+        run: docker push akashgrowmore/results-nodejs:latest
 
       # Build Docker image for the client
       - name: Build Docker Image for Client
-        run: docker build -t akashgrowmore/aus-liza-react:latest --build-arg REACT_APP_NODE_ENV='production' --build-arg REACT_APP_SERVER_BASE_URL='${{ secrets.REACT_APP_SERVER_BASE_URL }}' -f ./client/Dockerfile ./client
+        run: docker build -t akashgrowmore/results-reactjs:latest --build-arg REACT_APP_NODE_ENV='production' --build-arg REACT_APP_SERVER_BASE_URL='${{ secrets.REACT_APP_SERVER_BASE_URL }}' -f ./client/Dockerfile ./client
 
       # Push client image to Docker Hub
       - name: Publish Client Image to Docker Hub
-        run: docker push akashgrowmore/aus-liza-react:latest
+        run: docker push akashgrowmore/results-reactjs:latest
 
   # Deploy job for both client and server
   deploy:
@@ -48,24 +48,24 @@ jobs:
 
       # Pull the latest server image from Docker Hub
       - name: Pull Server Image from Docker Hub
-        run: docker pull akashgrowmore/aus-liza-nodejs:latest
+        run: docker pull akashgrowmore/results-nodejs:latest
 
       # Delete old server container if it exists
       - name: Delete Old Server Container
-        run: docker rm -f aus-liza-nodejs-container || true
+        run: docker rm -f results-nodejs-container || true
 
       # Run the server container
       - name: Run Server Container
-        run: docker run -d -p 3001:3001 --name aus-liza-nodejs-container -e MONGO_PASS='${{ secrets.MONGO_PASS }}' -e MONGO_USER="${{ secrets.MONGO_USER }}" akashgrowmore/aus-liza-nodejs:latest
+        run: docker run -d -p 3001:3001 --name results-nodejs-container -e MONGO_PASS='${{ secrets.MONGO_PASS }}' -e MONGO_USER="${{ secrets.MONGO_USER }}" akashgrowmore/results-nodejs:latest
 
       # Pull the latest client image from Docker Hub
       - name: Pull Client Image from Docker Hub
-        run: docker pull akashgrowmore/aus-liza-react:latest
+        run: docker pull akashgrowmore/results-reactjs:latest
 
       # Delete old client container if it exists
       - name: Delete Old Client Container
-        run: docker rm -f aus-liza-react-container || true
+        run: docker rm -f results-reactjs-container || true
 
       # Run the client container
       - name: Run Client Container
-        run: docker run -d -p 3000:80 --name aus-liza-react-container akashgrowmore/aus-liza-react:latest
+        run: docker run -d -p 3000:80 --name results-reactjs-container akashgrowmore/results-reactjs:latest
